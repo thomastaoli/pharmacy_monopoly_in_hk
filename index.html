@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<title>Where are Hong Kong's two largest pharmacies located?</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.5/turf.min.js'></script>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css' rel='stylesheet' />
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+
+	<style>
+
+		::-webkit-scrollbar {
+			width: 0px;
+			/* remove scrollbar space */
+			background: transparent;
+			/* optional: just make scrollbar invisible */
+		}
+
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255, 255, 255, 0.8);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px;
+		}
+
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+
+		.legend i {
+			width: 18px;
+			height: 18px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+
+		body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #title {
+            text-align: center;
+            font-size: 26px;
+            margin-top: 20px;
+            font-family: 'Avenir', Arial, sans-serif;
+            font-weight: bold;
+            width: 70%;
+        }
+
+        #subtitle {
+            text-align: left;
+            font-size: 24px;
+            margin-top: 20px;
+            font-family: 'Avenir', Arial, sans-serif;
+            font-weight: bold;
+            width: 70%;
+        }
+
+        #map {
+            position: relative;
+            width: 70%; /* Adjust this value to change the size of the map */
+            height: 80vh; /* Adjust the height of the map */
+            margin-top: 20px;
+        }
+
+		#map2 {
+            position: relative;
+            width: 70%; /* Adjust this value to change the size of the map */
+            height: 80vh; /* Adjust the height of the map */
+            margin-top: 20px;
+        }
+
+        #select-menu {
+            position: absolute;
+            left: 50px;
+            top: 10px;
+            z-index: 10;
+        }
+
+        #select-menu2 {
+            position: absolute;
+            left: 50px;
+            top: 10px;
+            z-index: 10;
+        }
+
+        #headPlace {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            z-index: 10;
+            padding: 10px;
+            width: 200px;
+            background-color: #DDDDDD;
+        }
+
+        #text {
+            font-family: 'Avenir', sans-serif; /* Avenir font */
+            text-align: left; /* Center align text */
+            font-size: 16px;
+            margin: auto; /* Center the div in the middle of the page horizontally */
+            width: 70%;
+        }
+
+        #byline {
+            margin-top: 20px;
+            text-align: center;
+            font-family: 'Avenir', sans-serif;
+            font-size: 18px; 
+        }
+
+        #footer {
+            text-align: center;
+            padding: 4em;
+            font-family: 'Avenir', sans-serif;
+            border-top: solid white 5px;
+        }
+		
+
+	</style>
+
+</head>
+
+<body>
+
+	<div id='title'> Asia's "Monopoly City" in Data: How two major retail groups monopolized Hong Kong’s pharmacy business</div>
+	
+	<div id='byline'>By Thomas Li</div>
+	
+	<div id='text'>
+    <p>In Hong Kong, monopolistic practices across various sectors, especially in real estate and retail, present significant challenges to competition and consumer welfare. Leading companies like Sun Hung Kai Properties and CK Asset Holdings have dominated the real estate market. Since the 1980s, they have acquired extensive land areas, mainly in the New Territories. This approach, coupled with the government's high land price policy, has sidelined smaller developers, resulting in a monopoly on land ownership.</p>
+
+    <p>However, this trend is not limited to the land market. The retail sector also exhibits a similar pattern of market concentration. The Hong Kong government's guidelines suggest substantial market power is assumed for companies with a market share above 40%.<sup><a href="https://www.legco.gov.hk/yr09-10/english/bc/bc12/papers/bc120720cb1-2749-1-e.pdf">[1]</a></sup> However, the Consumer Council of Hong Kong in 2013 revealed the duopoly of grocery chains Hutchison Whampoa (HWL) and Daily Farm International (DFI) - together, they hold a nearly 60% market share.<sup><a href="http://pdf.wenweipo.com/2013/12/20/a24-1220.pdf">[2]</a></sup> This dominance extends beyond groceries to the household necessities market.</p> 
+
+    <p>To grasp the full extent of this market concentration, I invite readers to view my map, which displays the locations of Mannings and Watsons, the two largest pharmacy chains in Hong Kong, owned by these groups.<sup>[3]</sup></p>
+    </div>
+
+	<div id='subtitle'>How many pharmacies do HWL and DFI own?</div>
+
+	<div id='map'>
+		<div id="dropdown">
+			<select id="select-menu">
+				<option value="all">All Pharmacies</option>
+			</select>
+		</div>
+	</div>
+	
+	<div id='text'>
+    <p>Mannings, owned by DFI, has over 300 outlets. Watsons, owned by HWL, has nearly 200 outlets. This translates to the two major groups operating almost 1.7 pharmacies per square kilometer, significantly limiting choices for Hong Kong residents.<sup>[4]</sup> This is especially true for those living in new towns - because the business types in the area are often dominated by large shopping malls, with little or no small businesses.</p>
+
+    <p>The two major groups are using their monopoly position in the market to simultaneously squeeze citizens and suppliers. In addition to controlling the price of goods, they also charge a wide range of fees to suppliers. Those who cannot afford it will have their products removed from the shelves. According to surveys, the gross profit margins of the two major retail groups can reach 30–40%.<sup>[5]</sup></p>
+
+    <p>This monopoly situation is not unrelated to the Hong Kong government’s urban planning strategy. To cope with the growing population, the government established many satellite cities outside the core area. They often connect urban areas with railways. The government is also building flyovers to connect high-density public housing and middle-class housing estates with railway stations and large shopping malls. While such planning improves traffic efficiency, it also sacrifices the profits of small and medium-sized businesses, because they often open shops at street level.</p>
+    
+    <p>The map below shows the total and per capita number of Mannings and Watsons in each of Hong Kong’s 18 district, together with demographic data.<sup>[6]</sup> Darker color represents more pharmacies in the area.</p>
+    </div>
+	
+	<div id='subtitle'>How many Mannings/Watsons pharmacies are in each district?</div>
+	
+	<div id='map2'>
+        <div id="dropdown2">
+            <select id="select-menu2">
+                <option value="total">Mannings and Watsons in the District</option>
+                <option value="perCapita">Mannings and Watsons Per Capita</option>
+            </select>
+        </div>
+    </div>
+	
+    <div id='text'>
+    <p>Sha Tin, one of the new towns, has 45 shops, which is the most. The situation changes slightly when we move to population-based data. Central and Western, Wan Chai and Yau Tsim Mong have extremely high numbers of pharmacies per capita because they are commercial districts in the traditional sense. The North District also has a very high number due to the large number of "parallel importers" from China before the pandemic (yes, there were many people from China who went to Hong Kong pharmacies to raid baby formula and cosmetics).<sup><a href="http://www.takungpao.com.hk/mainland/text/2018/0609/174004.html">[7]</a></sup> The phenomenon in the Islands District is more interesting - this is the largest area in Hong Kong and is dominated by water. Residents mainly live in the Tung Chung New Town near the airport. The government has not set up any public markets in the district, making residents in the district extremely dependent on chain businesses.<sup><a href="https://www.hk01.com/article/763233?utm_source=01articlecopy&utm_medium=referra">[8]</a></sup> Furthermore, the opening of the Hong Kong-Zhuhai-Macao Bridge has attracted shoppers from China to the area, further encouraging the growth of chain businesses.<sup><a href="https://www.nytimes.com/2018/11/23/world/asia/china-hong-kong-tung-chung.html">[9]</a></sup></p>
+	
+	<p>Pharmacies are just the tip of the iceberg when it comes to Hong Kong’s retail monopoly. And this madness is so prevalent in government-owned grassroots housing. This stems from the fact that the Hong Kong government was forced to sell shopping malls under the Housing Authority in 2005 due to financial pressure. Since the government does not have any controlling interest in these shopping malls that are supposed to be publicly owned, and private real estate funds have rapidly increased rents, the living space of small merchants has been continuously strangled.<sup><a href="https://www.scmp.com/news/hong-kong/politics/article/1966480/three-mountains-hong-kong-government-eyes-link-reit-mtr-fare">[10]</a></sup></p>
+    </div>
+    
+    <div id='subtitle' style='font-style: italic;'>
+    Read more: 
+    <a href="https://public.flourish.studio/visualisation/15270866/" target="_blank">
+        What's inside Hong Kong's largest REIT malls?
+    </a>
+    </div>
+
+    <div id='text'>
+	<p>In concluding the examination of Hong Kong's retail pharmacy sector, primarily dominated by Mannings and Watsons, it is imperative to reflect on the need for fair competition. The stance of the government advocating for industry self-regulation raises critical questions. The growing global focus on business ethics and fair competition in academic and professional circles underscores the urgency of this issue. It is increasingly clear that a market dominated by a few cannot self-regulate effectively to address structural challenges. Governmental intervention to foster an environment of fair competition is not just a theoretical ideal but a necessity for fostering innovation, ethical standards, and societal stability. The essence of a healthy market economy lies in ensuring operations are based on legality, freedom, transparency, and fairness, rather than non-interference, which often overlooks deeper market issues. For Hong Kong's economy to thrive inclusively, recognizing and addressing these concerns is paramount.</p>
+	</div>
+    
+    <div id='subtitle'>Reference & Note</div>
+    
+    <div id='text'>
+    <p>[1] The Key to Perfecting Competition Legislation Creating a Favourable Business Environment and Protecting Consumer Interests. (2011). <a href="https://www.legco.gov.hk/yr09-10/english/bc/bc12/papers/bc120720cb1-2749-1-e.pdf">https://www.legco.gov.hk/yr09-10/english/bc/bc12/papers/bc120720cb1-2749-1-e.pdf</a></p>
+    <p>[2] 陳廣盛. (2013, December 20). 消委指營商不公 兩大超市澄清. 文匯報. <a href="http://pdf.wenweipo.com/2013/12/20/a24-1220.pdf">http://pdf.wenweipo.com/2013/12/20/a24-1220.pdf</a></p>
+    <p>[3] Data based on store locators of DFI and HWL.</p>
+    <p>[4] The calculation is based on the data of developed area of Hong Kong released by Civil Engineering and Developement Department. See <a href="https://www.cedd.gov.hk/filemanager/eng/content_954/Info_Sheet2.pdf">https://www.cedd.gov.hk/filemanager/eng/content_954/Info_Sheet2.pdf</a></p>
+    <p>[5] 陳增聲, 楊偉文. (2004). 零售市場的壟斷問題：探討與分析. 工商管理研究社2004年年刊. pp.51 – 52</p>
+    <p>[6] Population and Household Statistics Analysed by District Council District. (2023). Census and Statistics Department. <a href="https://www.censtatd.gov.hk/en/wbr.html?ecode=B11303012022AN22&scode=500">https://www.censtatd.gov.hk/en/wbr.html?ecode=B11303012022AN22&scode=500</a></p>
+    <p>[7] 大公報. (2018, June 9). 個人遊帶挈 藥房十年增逾3000間. <a href="http://www.takungpao.com.hk/mainland/text/2018/0609/174004.html">http://www.takungpao.com.hk/mainland/text/2018/0609/174004.html</a> </p>
+    <p>[8] 區禮城. (2022, April 25). 東涌永久公眾街市落成無期 調查指85%受訪居民感極失望. 香港01. <a href="https://www.hk01.com/article/763233?utm_source=01articlecopy&utm_medium=referral">https://www.hk01.com/article/763233?utm_source=01articlecopy&utm_medium=referral</a></p>
+    <p>[9] Qin, A., & May, T. (2018, November 23). For Some in Hong Kong, New Bridge Has a Downside: “That Kind of Tourist.” The New York Times. <a href="https://www.nytimes.com/2018/11/23/world/asia/china-hong-kong-tung-chung.html">https://www.nytimes.com/2018/11/23/world/asia/china-hong-kong-tung-chung.html</a></p>
+    <p>[10] Tony, C. (2016, June 6). Three mountains: Hong Kong government eyes Link Reit, MTR fare rises and the provident fund. South China Morning Post. <a href="https://www.scmp.com/news/hong-kong/politics/article/1966480/three-mountains-hong-kong-government-eyes-link-reit-mtr-fare">https://www.scmp.com/news/hong-kong/politics/article/1966480/three-mountains-hong-kong-government-eyes-link-reit-mtr-fare</a></p>
+    </div>
+
+    <div id="footer">
+        <strong>About Me</strong>
+            <p><a href="https://thomastaoli.github.io/">Check out my portfolio</a></p>
+            <p><a href="https://www.linkedin.com/in/thomas-li-3325561a2">My LinkedIn</a></p>
+            <center> Copyright &copy; Thomas Tao Li <br> Email:<a href="mailto:tl3269@columbia.edu"> tl3269@columbia.edu </a>
+            </center>
+    </div>
+
+	<!-- 
+THIS IS WHERE THE BROWSER LOADS THE GEOJSON INFORMATION
+ -->
+
+	<script type="text/javascript" src="geo-data.js"></script>
+	<script type="text/javascript" src="18_district_gradient.js"></script>
+
+
+	<!-- 
+HERE BEGINS ALL THE SCRIPT THAT SETS UP THE MAP 
+ -->
+
+	<script type="text/javascript">
+		
+		mapboxgl.accessToken = 'pk.eyJ1IjoibGl0YW90aG9tYXNsZWUiLCJhIjoiY2xwenc4eTEzMHc1cjJtbnAwY2Q5cXNoNiJ9.uFOrpSKa1zzLG3MDoQ8BOg';
+
+		var map = new mapboxgl.Map({
+			container: 'map', 
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [114.1694, 22.3193],
+            zoom: 10
+		});
+		map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+// all of this JavaScript manages what's displayed on hover and click
+		var popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+
+		let hoverCurrentId = null
+		var datalayer;
+
+		function updateArticle(e) {
+			let feature = e.features[0]
+			document.getElementById("articlePlace").innerHTML = feature.properties.article
+		}
+		function updateHead(e) {
+			let feature = e.features[0]
+			map.getCanvas().style.cursor = 'pointer';
+			let content = '<b>' + feature.properties.group_name + '</b><br>' +
+              'Address: ' + feature.properties.name;
+			document.getElementById("headPlace").innerHTML = content
+
+		}
+		function removeHead(e) {
+			document.getElementById("headPlace").innerHTML = "&nbsp;"
+			map.getCanvas().style.cursor = '';
+
+		}
+
+		function startHover(e) {
+			let feature = e.features[0]
+
+			if (hoverCurrentId) {
+				map.setFeatureState({ source: 'datalayer', id: hoverCurrentId }, { hover: false });
+			}
+			hoverCurrentId = feature.id
+			map.setFeatureState({ source: 'datalayer', id: hoverCurrentId }, { hover: true });
+		}
+
+		function stopHover(e) {
+			if (hoverCurrentId) {
+				map.setFeatureState({ source: 'datalayer', id: hoverCurrentId }, { hover: false });
+			}
+			hoverCurrentId = null;
+		}
+
+		function drawPopup(e) {
+            let feature = e.features[0];
+            map.getCanvas().style.cursor = 'pointer';
+
+            let content = '<b>' + feature.properties.group_name + '</b><br>' +'Address: ' + feature.properties.name + '<br>';
+
+            var coordinates = feature.geometry.coordinates.slice();
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;}
+
+            popup.setLngLat(coordinates)
+            .setHTML(content)
+            .addTo(map);
+        }
+
+		function removePopup(e) {
+			map.getCanvas().style.cursor = '';
+			popup.remove();
+		}
+
+		
+		map.on('load', function () {
+			for (let i = 0; i < infoData.features.length; i++) {
+				infoData.features[i]['id'] = i + 1
+			}
+
+			datalayer = map.addLayer({
+				id: "datalayer",
+				type: "circle",
+				source: {
+					type: "geojson",
+					data: infoData,
+				},
+				paint: {
+					'circle-radius': ['to-number', ['get', 'radius']],
+					'circle-stroke-color': 'white',
+					'circle-stroke-width': 2,
+					'circle-color': [
+						'case',
+						['boolean', ['feature-state', 'hover'], false],
+						'#666',
+						['get', 'color'],
+					],
+					'circle-opacity': [
+						'case',
+						['boolean', ['feature-state', 'hover'], false],
+						1,
+						0.5
+					]
+				}
+			});
+
+
+// these functions control Mouse actions
+// they make the pop-up headline or update the article text
+			map.on('mouseenter', 'datalayer', function (e) {
+				startHover(e)
+ 				drawPopup(e)
+				updateHead(e)
+			});
+
+			// turn off the hovering and popup
+			map.on('mouseleave', 'datalayer', function (e) {
+				stopHover(e)
+ 				removePopup(e)
+				removeHead(e)
+			});
+
+			// When we click, update the article (the right-hand side)
+			map.on('click', 'datalayer', function (e) {
+				updateArticle(e)
+			})
+
+//automatically centers the map and zooms it
+
+			map.fitBounds(turf.bbox(infoData), { padding: 120, linear: true })
+		})
+
+
+// Set map2	
+
+		var map2 = new mapboxgl.Map({
+            container: 'map2',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [114.1694, 22.3193],
+            zoom: 10
+            });
+		map2.addControl(new mapboxgl.NavigationControl(), 'top-left');
+		var popup2 = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+
+		let hoverCurrentId2 = null
+		var datalayer2;
+
+		function updateArticle2(e) {
+			let feature = e.features[0]
+			document.getElementById("articlePlace").innerHTML = feature.properties.article
+		}
+
+		function startHover2(e) {
+			let feature = e.features[0]
+
+			if (hoverCurrentId2) {
+				map.setFeatureState({ source: 'datalayer2', id: hoverCurrentId2 }, { hover: false });
+			}
+			hoverCurrentId2 = feature.id
+			map.setFeatureState({ source: 'datalayer2', id: hoverCurrentId2 }, { hover: true });
+		}
+
+		function stopHover2(e) {
+			if (hoverCurrentId2) {
+				map.setFeatureState({ source: 'datalayer2', id: hoverCurrentId2 }, { hover: false });
+			}
+			hoverCurrentId2 = null;
+		}
+
+		function drawPopup2(e) {
+             let feature = e.features[0]
+             map2.getCanvas().style.cursor = 'pointer';
+
+             var coordinates = e.lngLat;
+             var districtName = feature.properties.ENAME; // Retrieve the district's English name
+             var watsonsCount = feature.properties.Watsons; // Retrieve Watsons count
+             var manningsCount = feature.properties.Mannings; // Retrieve Mannings count
+             var population = feature.properties.pop;
+             var income = feature.properties.income;
+
+    // Ensure proper handling of coordinates crossing the antimeridian
+             while (Math.abs(e.lngLat.lng - coordinates.lng) > 180) {
+                 coordinates.lng += e.lngLat.lng > coordinates.lng ? 360 : -360;
+             }
+
+    // Set the popup content
+             popup2.setLngLat(coordinates)
+                  .setHTML(`<h4>${districtName}</h4><p>Watsons: ${watsonsCount}</p><p>Mannings: ${manningsCount}</p><p>Population (K): ${population}</p><p>Medium Income (HK$): ${income}</p>`)
+                  .addTo(map2);
+            }
+
+		function removePopup2(e) {
+			map2.getCanvas().style.cursor = '';
+			popup2.remove();
+		}
+
+		map2.on('load', function () {
+			
+			for (let i = 0; i < gradientData.features.length; i++) {
+				gradientData.features[i]['id'] = i + 1
+			}
+
+
+			datalayer2 = map2.addLayer({
+				id: "datalayer2",
+				type: "fill",
+				source: {
+					type: "geojson",
+					data: gradientData,
+				},
+				paint: {
+					'fill-color': ['get', 'fill'],
+					'fill-outline-color': 'white',
+					'fill-opacity': [
+						'case',
+						['boolean', ['feature-state', 'hover'], false],
+						1,
+						0.5
+					]
+				}
+			});
+
+			map2.on('mousemove', 'datalayer2', function (e) {
+				startHover2(e)
+				drawPopup2(e)
+			});
+
+			// When we move the mouse away from a point, turn off the hovering and popup
+			map2.on('mouseleave', 'datalayer2', function (e) {
+				stopHover2(e)
+				removePopup2(e)
+			});
+
+			// When we click, update the article (the right-hand side)
+			map2.on('click', 'datalayer2', function (e) {
+				updateArticle2(e)
+			});
+			map2.fitBounds(turf.bbox(gradientData), { padding: 0, linear: true })
+
+		})
+
+
+// the JavaScript below sets up the styles of the colors based on your properties
+// color, radius, and rating
+
+		
+	</script>
+	<script>
+	// this part is J query / with some mapbox JavaScript
+	// it changes what is displayed based on the pulldown menu
+		var groupsObj = {};
+
+		$(document).ready(function () {
+			infoData.features.forEach(function (feature) {
+				groupsObj[feature.properties.group_id] = feature.properties.group_name;
+			})
+
+			$.each(groupsObj, function (key, value) {
+				$('#select-menu')
+					.append($("<option></option>")
+						.attr("value", value)
+						.text(value));
+			});
+
+			$('#select-menu').change(function () {
+				var selectedGroup = $('#select-menu').val();
+
+				if (selectedGroup === 'all') {
+					map.setFilter('datalayer', null); 
+                } else {
+					map.setFilter('datalayer', ['==', ['get', 'group_name'], selectedGroup]);
+				}
+			});
+		});
+
+		var groupsObj2 = {};
+
+			$('#select-menu2').change(function () {
+                var selectedMetric = $('#select-menu2').val();
+
+                if (selectedMetric === 'total') {
+        // Update map2 to show total pharmacy count
+                    map2.setPaintProperty('datalayer2', 'fill-color', ['get', 'fill']);
+                } else if (selectedMetric === 'perCapita') {
+        // Update map2 to show pharmacy per capita
+                  map2.setPaintProperty('datalayer2', 'fill-color', ['get', 'fill_per_capita']);
+                }
+});
+	</script>
+
+
+</body>
+
+</html>
